@@ -4,17 +4,20 @@ import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 
 class MongoBootStrapUtils {
 
-	transient def db
+	static final DEFAULT_KEEP_COLLECTIONS_PATTERN = /system.*/
 	
+	def keepCollectionsRegex = DEFAULT_KEEP_COLLECTIONS_PATTERN
 	def	databaseName
 	def	username
 	transient def password
+	transient def db
 	
 	MongoBootStrapUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
-		def dbConfig	= grailsApplication.config.grails.mongo
-		databaseName	= dbConfig.databaseName
-		username		= dbConfig.username 
-		password		= dbConfig.password 
+		def dbConfig			= grailsApplication.config.grails.mongo
+		databaseName			= dbConfig.databaseName
+		username				= dbConfig.username 
+		password				= dbConfig.password 
+		keepCollectionsRegex	= dbConfig.keepCollectionsRegex?.trim() ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
 		validateConfig()
 		db = dbFactory.getByName(databaseName)
 	}
@@ -23,7 +26,7 @@ class MongoBootStrapUtils {
 		log.debug "Mongo credentials provided: ${credentialsProvided}"
 		if (credentialsProvided) {
 			authenticate()
-			dropAll(collectionsWithNameNotMatching(/system.*/))
+			dropAll(collectionsWithNameNotMatching(keepCollectionsRegex))
 		} else {
 			log.debug "Dropping database: $databaseName"
 			db.dropDatabase()

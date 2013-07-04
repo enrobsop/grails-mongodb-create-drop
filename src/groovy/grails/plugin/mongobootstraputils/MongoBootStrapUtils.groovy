@@ -6,15 +6,12 @@ class MongoBootStrapUtils {
 
 	transient def db
 	
-	def	authMode
 	def	databaseName
 	def	username
-	
 	transient def password
 	
 	MongoBootStrapUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
 		def dbConfig	= grailsApplication.config.grails.mongo
-		authMode		= dbConfig.authMode ?: false
 		databaseName	= dbConfig.databaseName
 		username		= dbConfig.username 
 		password		= dbConfig.password 
@@ -23,8 +20,8 @@ class MongoBootStrapUtils {
 	}
 	
 	void dropCreate() {
-		log.debug "Mongo running in 'auth' mode: ${authMode}"
-		if (authMode) {
+		log.debug "Mongo credentials provided: ${credentialsProvided}"
+		if (credentialsProvided) {
 			authenticate()
 			dropAll(collectionsWithNameNotMatching(/system.*/))
 		} else {
@@ -50,24 +47,21 @@ class MongoBootStrapUtils {
 			db.getCollection(it).drop()
 		}
 	}
+	
+	private boolean isCredentialsProvided() {
+		username || password
+	}
 
 	private void failIfInvalidConfig() {
-		failIfAuthModeInvalid()
-		failIfMissingCredentials()
-	}
-		
-	private void failIfAuthModeInvalid() {
-		if (isSetButNotBoolean(authMode)) {
-			throw new GrailsConfigurationException("'grails.mongo.authMode' must be boolean. ${authMode.getClass()}")
-		}
+		failIfDatabaseNameMissing() 
 	}
 	
-	private void failIfMissingCredentials() {
-		if (authMode && !(username && password)) {
-			throw new GrailsConfigurationException("Username and password must be provided when using 'auth' mode.")
+	private void failIfDatabaseNameMissing() {
+		if (!databaseName) {
+			//throw 
 		}
 	}
-
+		
 	private static boolean isSetButNotBoolean(value) {
 		value != null && value?.getClass() != Boolean
 	}

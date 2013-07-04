@@ -20,69 +20,6 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 		dbFactory.getByName(_) >> mongo
 	}
 	
-	@Unroll
-	def "using a non-boolean authMode flag ['#theAuthMode'] throws an exception"() {
-		
-		given: "a grailsApplication config"
-			def config = newMongoConfig([authMode: theAuthMode, username: "u", password: "p"])
-		when: "creating the bootstrap helper class with a mock database"
-			def utils = new MongoBootStrapUtils(config, dbFactory)
-			
-		then: "an exception is thrown"
-			thrown GrailsConfigurationException
-			
-		where:
-			theAuthMode << [" ", "true", "false", "TRUE", "FALSE", 1]
-			
-	}
-	
-	@Unroll
-	def "using a boolean or null authMode flag ['#theAuthMode'] should set the flag correctly"() {
-		
-		given: "a grailsApplication config"
-			def config = newMongoConfig([authMode: theAuthMode, username: "u", password: "p"])
-		and: "the bootstrap helper class with a mock database"
-			def utils = new MongoBootStrapUtils(config, dbFactory)
-		
-		when: "the authMode flag is determined"
-			def result = utils.authMode
-			
-		then: "the correct result is obtained"
-			result == theExpectedResult
-			
-		where:
-			theAuthMode	| theExpectedResult
-			true		| true
-			false		| false
-			null		| false
-			0			| false
-
-	}
-	
-	@Unroll
-	def "should throw an exception when authMode is on but username/password=[#theUsername, #thePassword]"() {
-
-		given: "a grailsApplication config"
-			def config = newMongoConfig([
-				authMode:	true,
-				username:	theUsername,
-				password:	thePassword
-			])
-			
-		when: "the bootstrap helper class is created"
-			def utils = new MongoBootStrapUtils(config, dbFactory)
-			
-		then: "an exception is thrown"
-			thrown GrailsConfigurationException
-		
-		where:
-			theUsername	| thePassword
-			"admin"		| null
-			null		| "password"
-			null		| null
-		
-	}
-
 	def "dropCreate should behave correctly when not in auth mode"() {
 		
 		given: "no auth mode"
@@ -144,7 +81,7 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 	}
 	
 	private def getAuthModeConfig() {
-		newMongoConfig([authMode:true, username: "aUser", password: "aPassword"])
+		newMongoConfig([username: "aUser", password: "aPassword"])
 	}
 	
 }

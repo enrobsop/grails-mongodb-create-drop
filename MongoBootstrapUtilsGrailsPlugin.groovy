@@ -2,8 +2,7 @@ class MongoBootstrapUtilsGrailsPlugin {
     def version = "0.1.SNAPSHOT"
     def grailsVersion = "2.0 > *"
 	def dependsOn = [
-		'mongodb': "* > 1.0.0.RC3",
-		'burning-image': "* > 0.5.0"
+		'mongodb': "* > 1.0.0.RC3"
 	]
     def pluginExcludes = [
 		"grails-app/controllers/**",

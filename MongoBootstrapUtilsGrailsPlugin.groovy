@@ -6,10 +6,10 @@ class MongoBootstrapUtilsGrailsPlugin {
 		'burning-image': "* > 0.5.0"
 	]
     def pluginExcludes = [
-		"grails-app/controllers/**',
-		"grails-app/domain/**',
-		"grails-app/i18n/**',
-		"grails-app/views/**/*"
+		"grails-app/controllers/**",
+		"grails-app/domain/**",
+		"grails-app/i18n/**",
+		"grails-app/views/**/*",
 		"web-app/**"    
 	]
 

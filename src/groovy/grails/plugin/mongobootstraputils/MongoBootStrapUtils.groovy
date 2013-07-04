@@ -15,8 +15,8 @@ class MongoBootStrapUtils {
 		databaseName	= dbConfig.databaseName
 		username		= dbConfig.username 
 		password		= dbConfig.password 
-		failIfInvalidConfig()
-		db 				= dbFactory.getByName(databaseName)
+		validateConfig()
+		db = dbFactory.getByName(databaseName)
 	}
 	
 	void dropCreate() {
@@ -52,13 +52,13 @@ class MongoBootStrapUtils {
 		username || password
 	}
 
-	private void failIfInvalidConfig() {
+	private void validateConfig() {
 		failIfDatabaseNameMissing() 
 	}
 	
 	private void failIfDatabaseNameMissing() {
 		if (!databaseName) {
-			//throw 
+			throw new GrailsConfigurationException("'grails.mongo.databaseName' is missing.")
 		}
 	}
 		

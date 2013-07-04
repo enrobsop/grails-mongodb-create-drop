@@ -5,9 +5,7 @@ import grails.test.mixin.*
 
 import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 
-import spock.lang.IgnoreRest
 import spock.lang.Shared
-import spock.lang.Unroll
 
 class MongoBootStrapUtilsSpec extends UnitSpec {
 
@@ -20,10 +18,23 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 		dbFactory.getByName(_) >> mongo
 	}
 	
+	def "config validation should work correctly"() {
+		
+		given: "a grailsApplication config without a databaseName"
+			def config = newMongoConfig([:])
+			
+		when: "creating the bootstrap helper"
+			def Utils = new MongoBootStrapUtils(config, dbFactory)
+		
+		then: "a configuration exception is thrown"
+			thrown GrailsConfigurationException
+		
+	}
+	
 	def "dropCreate should behave correctly when not in auth mode"() {
 		
 		given: "no auth mode"
-			def config = newMongoConfig([:])
+			def config = noAuthModeConfig
 		and: "the bootstrap helper class with a mock database"
 			def utils = new MongoBootStrapUtils(config, dbFactory)
 			
@@ -35,7 +46,6 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 
 	}
 	
-	@IgnoreRest
 	def "dropCreate should behave correctly when in auth mode"() {
 		
 		given: "auth mode is configured"
@@ -77,11 +87,11 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 	}
 	
 	private def getNoAuthModeConfig() {
-		newMongoConfig()
+		newMongoConfig([databaseName: "aDatabase"])
 	}
 	
 	private def getAuthModeConfig() {
-		newMongoConfig([username: "aUser", password: "aPassword"])
+		newMongoConfig([databaseName: "aDatabase", username: "aUser", password: "aPassword"])
 	}
 	
 }

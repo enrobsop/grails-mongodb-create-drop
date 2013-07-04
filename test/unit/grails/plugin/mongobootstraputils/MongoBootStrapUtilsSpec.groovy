@@ -8,6 +8,7 @@ import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 import spock.lang.Shared
 import spock.lang.Unroll
 
+@TestMixin(MongoBootStrapUtilsSpecHelper)
 class MongoBootStrapUtilsSpec extends UnitSpec {
 
 	@Shared dbFactory
@@ -135,42 +136,4 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 			0 * mongo.getCollection("system.users")
 	}
 
-	private def newMongoConfig(options=[:]) {
-		[
-			config: [
-				grails: [
-					mongo: options
-				]
-			]
-		]
-	}
-	
-	private def getNoAuthModeConfig() {
-		newMongoConfig([databaseName: "aDatabase"])
-	}
-	
-	private def getAuthModeConfig() {
-		newMongoConfig([databaseName: "aDatabase", username: "aUser", password: "aPassword"])
-	}
-	
-}
-
-class TestDB {
-	
-	void dropDatabase() {}
-	
-	void authenticate(username, password) {}
-	
-	def getCollection(name) { }
-	
-	def getCollectionNames() { }
-	
-}
-
-class TestCollection {
-	
-	def name
-	
-	void drop() {}
-	
 }

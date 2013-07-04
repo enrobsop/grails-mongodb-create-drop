@@ -24,27 +24,34 @@ class MongoBootStrapUtils {
 	
 	void dropCreate() {
 		log.debug "Mongo credentials provided: ${credentialsProvided}"
-		if (credentialsProvided) {
-			authenticate()
-			dropAll(collectionsWithNameNotMatching(keepCollectionsRegex))
+		if (authenticate()) {
+			drop(collectionsWithNameNotMatching(keepCollectionsRegex))
 		} else {
-			log.debug "Dropping database: $databaseName"
-			db.dropDatabase()
+			dropDatabase()
 		}
 	}
 	
-	void authenticate() {
-		log.debug "Authenticating..."
-		db.authenticate(username, password as char[])
+	private boolean authenticate() {
+		boolean isAuthMode = credentialsProvided
+		if (isAuthMode) {
+			log.debug "Authenticating..."
+			db.authenticate(username, password as char[])
+		}
+		isAuthMode
 	}
 	
-	def collectionsWithNameNotMatching(regex) {
+	private def collectionsWithNameNotMatching(regex) {
 		def allCollectionNames = db.getCollectionNames()
 		log.debug "All collections: $allCollectionNames"
 		allCollectionNames.findAll { !it.matches(regex) }			
 	}
 	
-	void dropAll(collectionNames) {
+	private void dropDatabase() {
+		log.debug "Dropping database: $databaseName"
+		db.dropDatabase()
+	}
+	
+	private void drop(collectionNames) {
 		collectionNames.each {
 			log.debug "Dropping collection: $it"
 			db.getCollection(it).drop()
@@ -63,10 +70,6 @@ class MongoBootStrapUtils {
 		if (!databaseName) {
 			throw new GrailsConfigurationException("'grails.mongo.databaseName' is missing.")
 		}
-	}
-		
-	private static boolean isSetButNotBoolean(value) {
-		value != null && value?.getClass() != Boolean
 	}
 		
 }

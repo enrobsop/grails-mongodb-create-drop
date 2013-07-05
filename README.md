@@ -13,15 +13,13 @@ Features:
 Installation
 ------------
 
-Quick Start
------------
-1. Add `createDrop` config in `config/Datasource.groovy`.
-2. Invoke from `config/BootStrap.groovy`. 
-
 Usage
 -----
 
-The plugin is configured using the `grails.mongo.createDrop` property in `config/Datasource.groovy`. The *drop-create* behaviour is then invoked from `config/BootStrap.groovy`. Please see the samples below.
+1. Add `grails.mong.createDrop` config in `config/Datasource.groovy`.
+2. Invoke from `config/BootStrap.groovy`. 
+
+Please see the samples below.
 
 ### Sample `config/Datasource.groovy`
 

@@ -5,7 +5,8 @@ enum DropCreateType {
 	none,
 	database,
 	collections,
-	keep
+	keep,
+	drop
 	
 	static def lookup(String str) {
 		DropCreateType.valueOf(clean(str))

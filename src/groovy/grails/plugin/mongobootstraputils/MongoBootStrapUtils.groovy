@@ -8,21 +8,20 @@ class MongoBootStrapUtils {
 
 	static final DEFAULT_KEEP_COLLECTIONS_PATTERN = "system\\..*"
 	
-	DropCreateType type = none
-	
-	def keepCollectionsRegex = DEFAULT_KEEP_COLLECTIONS_PATTERN
+	DropCreateType type		= none
+	def collectionsRegex	= DEFAULT_KEEP_COLLECTIONS_PATTERN
 	def	databaseName
 	def	username
 	transient def password
 	transient def db
 	
 	MongoBootStrapUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
-		def dbConfig			= grailsApplication.config.grails.mongo
-		type					= DropCreateType.lookup(dbConfig.dropCreate)
-		databaseName			= dbConfig.databaseName
-		username				= dbConfig.username 
-		password				= dbConfig.password 
-		keepCollectionsRegex	= cleanRegexConfig(DropCreateType.getValue(dbConfig.dropCreate)) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
+		def dbConfig		= grailsApplication.config.grails.mongo
+		type				= DropCreateType.lookup(dbConfig.dropCreate)
+		databaseName		= dbConfig.databaseName
+		username			= dbConfig.username 
+		password			= dbConfig.password 
+		collectionsRegex	= getRegexFrom(dbConfig)
 		validateConfig()
 		db = dbFactory.getByName(databaseName)
 	}
@@ -32,8 +31,10 @@ class MongoBootStrapUtils {
 		authenticate()
 		if (type == database) {
 			dropDatabase()
+		} else if (type == drop) {
+			dropAll(collectionsWithNameMatching())
 		} else {
-			drop(collectionsWithNameNotMatching(keepCollectionsRegex))
+			dropAll(collectionsWithNameNotMatching())
 		}
 	}
 	
@@ -43,6 +44,10 @@ class MongoBootStrapUtils {
 			log.debug "Nothing to do for type='$type'. Aborting dropCreate."
 		} 
 		isNothingToDo
+	}
+	
+	private def getRegexFrom(config) {
+		cleanRegexConfig(DropCreateType.getValue(config.dropCreate)) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
 	}
 	
 	private def cleanRegexConfig(regex) {
@@ -61,18 +66,27 @@ class MongoBootStrapUtils {
 		isAuthMode
 	}
 	
-	private def collectionsWithNameNotMatching(regex) {
+	private def collectionsWithNameNotMatching() {
+		findCollectionNamesWhere() {!it.matches(collectionsRegex) }
+	}
+	
+	private def collectionsWithNameMatching() {
+		findCollectionNamesWhere() { it.matches(collectionsRegex) }
+	}
+	
+	private def findCollectionNamesWhere(condition) {
 		def allCollectionNames = db.getCollectionNames()
 		log.debug "All collections: $allCollectionNames"
-		allCollectionNames.findAll { !it.matches(regex) }
+		allCollectionNames.findAll { condition(it) }
 	}
+
 	
 	private void dropDatabase() {
 		log.debug "Dropping database: $databaseName"
 		db.dropDatabase()
 	}
 	
-	private void drop(collectionNames) {
+	private void dropAll(collectionNames) {
 		collectionNames.each {
 			log.debug "Dropping collection: $it"
 			db.getCollection(it).drop()

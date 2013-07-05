@@ -52,7 +52,7 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 		then: "the correct type is used"
 			utils.type == none
 		and: "the correct keep pattern is used"
-			utils.keepCollectionsRegex == MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
+			utils.collectionsRegex == MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
 
 	}
 
@@ -67,7 +67,7 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 		then: "the correct type is used"
 			utils.type == none
 		and: "the correct keep pattern is used"
-			utils.keepCollectionsRegex == MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
+			utils.collectionsRegex == MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
 		
 	}
 
@@ -83,7 +83,7 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 			def utils = new MongoBootStrapUtils(config, dbFactory)
 			
 		then: "the correct pattern is used"
-			utils.keepCollectionsRegex == theExpectedPattern
+			utils.collectionsRegex == theExpectedPattern
 			
 		where:
 			theConfiguredPattern	| theExpectedPattern
@@ -141,10 +141,12 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 			getNoAuthModeConfig([dropCreate:"collections"])					| 0			| 0				| 1 			| 1			| 1		| 1			| 0				| 0
 			getNoAuthModeConfig([dropCreate:"keep:system\\.users"])			| 0			| 0				| 1				| 1			| 1		| 1			| 1				| 0
 			getNoAuthModeConfig([dropCreate:"keep:(system\\.users|book)"])	| 0			| 0				| 1				| 1			| 0		| 1			| 1				| 0
+			getNoAuthModeConfig([dropCreate:"drop:(book|author)"])			| 0			| 0				| 1				| 0			| 1		| 1			| 0				| 0
 			getAuthModeConfig([dropCreate:"database"])						| 1			| 1				| 0				| 0			| 0		| 0			| 0				| 0
 			getAuthModeConfig([dropCreate:"none"])							| 0			| 0				| 0				| 0			| 0		| 0			| 0				| 0
 			getAuthModeConfig([dropCreate:"collections"])					| 0			| 1				| 1				| 1			| 1		| 1			| 0				| 0
 			getAuthModeConfig([dropCreate:"keep:system\\.users"])			| 0			| 1				| 1				| 1			| 1		| 1			| 1				| 0
+			getAuthModeConfig([dropCreate:"drop:(book|author)"])			| 0			| 1				| 1				| 0			| 1		| 1			| 0				| 0
 	}
 
 	private def mockCollectionCalled(name) {

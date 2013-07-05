@@ -26,6 +26,9 @@ class DropCreateTypeSpec extends UnitSpec {
 			"keep:system.*" | keep
 			"keep:" 		| keep
 			"keep"	 		| keep
+			"drop:system.*" | drop
+			"drop:" 		| drop
+			"drop"	 		| drop
 	}
 
 	@Unroll	
@@ -42,6 +45,12 @@ class DropCreateTypeSpec extends UnitSpec {
 			"keep:pattern:with:colon.*"	| "pattern:with:colon.*"
 			"keep:system\\.users"		| "system\\.users"
 			"keep"						| null
+			"drop:system.*"				| "system.*"
+			"drop:"						| null
+			"drop:  "					| null
+			"drop:pattern:with:colon.*"	| "pattern:with:colon.*"
+			"drop:system\\.users"		| "system\\.users"
+			"drop"						| null
 			""							| null
 			null						| null
 	}

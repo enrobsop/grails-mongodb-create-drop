@@ -37,6 +37,7 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 			theConfiguredPattern	| theExpectedPattern
 			null					| MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
 			""						| MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
+			[:]						| MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
 			" "						| MongoBootStrapUtils.DEFAULT_KEEP_COLLECTIONS_PATTERN
 			/system\.users.*/		| /system\.users.*/
 			"sys.*"					| "sys.*"

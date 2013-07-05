@@ -17,7 +17,7 @@ class MongoBootStrapUtils {
 		databaseName			= dbConfig.databaseName
 		username				= dbConfig.username 
 		password				= dbConfig.password 
-		keepCollectionsRegex	= dbConfig.keepCollectionsRegex?.trim() ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
+		keepCollectionsRegex	= cleanRegexConfig(dbConfig.keepCollectionsRegex) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
 		validateConfig()
 		db = dbFactory.getByName(databaseName)
 	}
@@ -29,6 +29,13 @@ class MongoBootStrapUtils {
 		} else {
 			dropDatabase()
 		}
+	}
+	
+	private def cleanRegexConfig(regex) {
+		if (regex?.respondsTo("trim")) {
+			return regex.trim()
+		}
+		regex
 	}
 	
 	private boolean authenticate() {

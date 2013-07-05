@@ -1,4 +1,4 @@
-grails-mongo-bootstrap
-======================
+grails-mongodb-create-drop
+==========================
 
-Grails Plugin to help with Mongo configuration during BootStrap.
+Provides Grails applications using MongoDB with the ability to mimic the "create-drop" behaviour available for other databases.

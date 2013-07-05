@@ -1,7 +1,22 @@
 Grails MongoDB Create-Drop Plugin
 =================================
 
-Provides Grails applications using MongoDB with the ability to mimic the "create-drop" behaviour available for other databases.
+This plugin enables Grails applications using MongoDB to mimic the "create-drop" behaviour available for other databases. This is useful during development, testing and integration.
+
+Features:
+* Drop and recreate a whole Mongo database at startup.
+* Drop and recreate a subset of collections within a database. For example, keep the Mongo users collection between startups.
+* Use regex patterns to keep or drop collections.
+* Can do nothing! For example, production environment.
+* Simplifies the transition between authenticated and non-authenticated Mongo instances. For example, when deploying to a CI server.
+
+Installation
+------------
+
+Quick Start
+-----------
+1. Add `createDrop` config in `config/Datasource.groovy`.
+2. Invoke from `config/BootStrap.groovy`. 
 
 Usage
 -----

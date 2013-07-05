@@ -12,12 +12,14 @@ class MongoBootStrapUtilsSpecHelper {
 		]
 	}
 	
-	def getNoAuthModeConfig() {
-		newMongoConfig([databaseName: "aDatabase"])
+	def getNoAuthModeConfig(options=[:]) {
+		def config = [databaseName: "aDatabase"] << options
+		newMongoConfig(config)
 	}
 	
-	def getAuthModeConfig() {
-		newMongoConfig([databaseName: "aDatabase", username: "aUser", password: "aPassword"])
+	def getAuthModeConfig(options=[:]) {
+		def config = [databaseName: "aDatabase", username: "aUser", password: "aPassword"] << options
+		newMongoConfig(config)
 	}
 
 }

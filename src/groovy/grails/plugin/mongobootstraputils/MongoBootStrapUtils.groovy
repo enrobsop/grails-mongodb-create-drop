@@ -2,9 +2,13 @@ package grails.plugin.mongobootstraputils
 
 import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
 
+import static grails.plugin.mongobootstraputils.DropCreateType.*
+
 class MongoBootStrapUtils {
 
-	static final DEFAULT_KEEP_COLLECTIONS_PATTERN = /system.*/
+	static final DEFAULT_KEEP_COLLECTIONS_PATTERN = "system\\..*"
+	
+	DropCreateType type = none
 	
 	def keepCollectionsRegex = DEFAULT_KEEP_COLLECTIONS_PATTERN
 	def	databaseName
@@ -14,21 +18,31 @@ class MongoBootStrapUtils {
 	
 	MongoBootStrapUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
 		def dbConfig			= grailsApplication.config.grails.mongo
+		type					= DropCreateType.lookup(dbConfig.dropCreate)
 		databaseName			= dbConfig.databaseName
 		username				= dbConfig.username 
 		password				= dbConfig.password 
-		keepCollectionsRegex	= cleanRegexConfig(dbConfig.keepCollectionsRegex) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
+		keepCollectionsRegex	= cleanRegexConfig(DropCreateType.getValue(dbConfig.dropCreate)) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
 		validateConfig()
 		db = dbFactory.getByName(databaseName)
 	}
 	
 	void dropCreate() {
-		log.debug "Mongo credentials provided: ${credentialsProvided}"
-		if (authenticate()) {
-			drop(collectionsWithNameNotMatching(keepCollectionsRegex))
-		} else {
+		if (doAbortBecauseNothingToDo()) return
+		authenticate()
+		if (type == database) {
 			dropDatabase()
+		} else {
+			drop(collectionsWithNameNotMatching(keepCollectionsRegex))
 		}
+	}
+	
+	private boolean doAbortBecauseNothingToDo() {
+		boolean isNothingToDo = type == none
+		if (isNothingToDo) {
+			log.debug "Nothing to do for type='$type'. Aborting dropCreate."
+		} 
+		isNothingToDo
 	}
 	
 	private def cleanRegexConfig(regex) {
@@ -50,7 +64,7 @@ class MongoBootStrapUtils {
 	private def collectionsWithNameNotMatching(regex) {
 		def allCollectionNames = db.getCollectionNames()
 		log.debug "All collections: $allCollectionNames"
-		allCollectionNames.findAll { !it.matches(regex) }			
+		allCollectionNames.findAll { !it.matches(regex) }
 	}
 	
 	private void dropDatabase() {

@@ -1,6 +1,6 @@
-package grails.plugin.mongobootstraputils
+package grails.plugin.mongodbcreatedrop
 
-class MongoBootStrapUtilsSpecHelper {
+class MongoCreateDropUtilsSpecHelper {
 
 	def newMongoConfig(options=[:]) {
 		[

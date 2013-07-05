@@ -1,21 +1,19 @@
-package grails.plugin.mongobootstraputils
+package grails.plugin.mongodbcreatedrop
 
-import org.codehaus.groovy.grails.exceptions.GrailsConfigurationException
+import static grails.plugin.mongodbcreatedrop.CreateDropType.*
 
-import static grails.plugin.mongobootstraputils.DropCreateType.*
-
-class MongoBootStrapUtils {
+class MongoCreateDropUtils {
 
 	static final DEFAULT_KEEP_COLLECTIONS_PATTERN = "system\\..*"
 	
-	DropCreateType type		= none
+	CreateDropType type		= none
 	def collectionsRegex	= DEFAULT_KEEP_COLLECTIONS_PATTERN
 	def	databaseName
 	def	username
 	transient def password
 	transient def db
 	
-	MongoBootStrapUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
+	MongoCreateDropUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
 		def dbConfig		= grailsApplication.config.grails.mongo
 		type				= getTypeFrom(dbConfig)
 		databaseName		= dbConfig.databaseName
@@ -26,7 +24,7 @@ class MongoBootStrapUtils {
 		db = dbFactory.getByName(databaseName)
 	}
 	
-	void dropCreate() {
+	void createDrop() {
 		if (doAbortBecauseNothingToDo()) return
 		authenticate()
 		if (type == database) {
@@ -41,21 +39,21 @@ class MongoBootStrapUtils {
 	private boolean doAbortBecauseNothingToDo() {
 		boolean isNothingToDo = type == none
 		if (isNothingToDo) {
-			log.debug "Nothing to do for type='$type'. Aborting dropCreate."
+			log.debug "Nothing to do for type='$type'. Aborting createDrop."
 		} 
 		isNothingToDo
 	}
 	
 	private def getTypeFrom(config) {
 		try {
-			return DropCreateType.lookup(config?.dropCreate)
+			return CreateDropType.lookup(config?.createDrop)
 		} catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException("Invalid value for dropCreate: $config.dropCreate")
+			throw new IllegalArgumentException("Invalid value for createDrop: $config.createDrop")
 		}
 	}
 	
 	private def getRegexFrom(config) {
-		cleanRegexConfig(DropCreateType.getValue(config.dropCreate)) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
+		cleanRegexConfig(CreateDropType.getValue(config.createDrop)) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
 	}
 	
 	private def cleanRegexConfig(regex) {

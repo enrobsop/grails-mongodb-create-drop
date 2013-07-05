@@ -1,6 +1,6 @@
-package grails.plugin.mongobootstraputils
+package grails.plugin.mongodbcreatedrop
 
-enum DropCreateType {
+enum CreateDropType {
 
 	none,
 	database,
@@ -9,7 +9,7 @@ enum DropCreateType {
 	drop
 	
 	static def lookup(String str) {
-		DropCreateType.valueOf(clean(str))
+		CreateDropType.valueOf(clean(str))
 	}
 	
 	private static String clean(str) {

@@ -1,17 +1,18 @@
-package grails.plugin.mongobootstraputils
+package grails.plugin.mongodbcreatedrop
 
-import static grails.plugin.mongobootstraputils.DropCreateType.*
+import static grails.plugin.mongodbcreatedrop.CreateDropType.*
 
+import grails.plugin.mongodbcreatedrop.CreateDropType;
 import grails.plugin.spock.UnitSpec
 import spock.lang.Unroll
 
-class DropCreateTypeSpec extends UnitSpec {
+class CreateDropTypeSpec extends UnitSpec {
 
 	@Unroll
 	def "correctly lookups a type using a string value of [#str]"() {
 		
 		expect:
-			DropCreateType.lookup(str) == expectedEnumItem
+			CreateDropType.lookup(str) == expectedEnumItem
 		
 		where:		
 			str				| expectedEnumItem
@@ -35,7 +36,7 @@ class DropCreateTypeSpec extends UnitSpec {
 	def "correctly gets the value from a combo string value [#str]"() {
 		
 		expect:
-			DropCreateType.getValue(str) == expectedValue 
+			CreateDropType.getValue(str) == expectedValue 
 		
 		where:
 			str							| expectedValue

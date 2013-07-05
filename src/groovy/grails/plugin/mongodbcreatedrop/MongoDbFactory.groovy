@@ -1,4 +1,4 @@
-package grails.plugin.mongobootstraputils
+package grails.plugin.mongodbcreatedrop
 
 import com.gmongo.GMongo
 

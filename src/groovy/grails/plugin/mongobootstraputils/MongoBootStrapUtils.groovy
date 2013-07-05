@@ -17,7 +17,7 @@ class MongoBootStrapUtils {
 	
 	MongoBootStrapUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
 		def dbConfig		= grailsApplication.config.grails.mongo
-		type				= DropCreateType.lookup(dbConfig.dropCreate)
+		type				= getTypeFrom(dbConfig)
 		databaseName		= dbConfig.databaseName
 		username			= dbConfig.username 
 		password			= dbConfig.password 
@@ -44,6 +44,14 @@ class MongoBootStrapUtils {
 			log.debug "Nothing to do for type='$type'. Aborting dropCreate."
 		} 
 		isNothingToDo
+	}
+	
+	private def getTypeFrom(config) {
+		try {
+			return DropCreateType.lookup(config?.dropCreate)
+		} catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException("Invalid value for dropCreate: $config.dropCreate")
+		}
 	}
 	
 	private def getRegexFrom(config) {
@@ -103,7 +111,7 @@ class MongoBootStrapUtils {
 	
 	private void failIfDatabaseNameMissing() {
 		if (!databaseName) {
-			throw new GrailsConfigurationException("'grails.mongo.databaseName' is missing.")
+			throw new IllegalArgumentException("'grails.mongo.databaseName' is missing.")
 		}
 	}
 		

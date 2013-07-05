@@ -41,6 +41,19 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 			"keep:system\\.users"	| keep
 	}
 	
+	@Unroll
+	def "invalid dropCreateTypes should be handled correctly"() {
+		
+		given: "a grailsApplication config with an invalid dropCreateType"
+			def config = newMongoConfig([dropCreate: "nonsense", databaseName: "myDb"])
+			
+			when: "creating the bootstrap helper"
+				new MongoBootStrapUtils(config, dbFactory)
+			
+			then: "the correct type is used"
+				thrown IllegalArgumentException
+	}
+	
 	def "the dropCreate type defaults correctly"() {
 		
 		given: "a minimal grailsApplication config"
@@ -103,7 +116,7 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 			new MongoBootStrapUtils(config, dbFactory)
 		
 		then: "a configuration exception is thrown"
-			thrown GrailsConfigurationException
+			thrown IllegalArgumentException
 		
 	}
 	
@@ -148,7 +161,7 @@ class MongoBootStrapUtilsSpec extends UnitSpec {
 			getAuthModeConfig([dropCreate:"keep:system\\.users"])			| 0			| 1				| 1				| 1			| 1		| 1			| 1				| 0
 			getAuthModeConfig([dropCreate:"drop:(book|author)"])			| 0			| 1				| 1				| 0			| 1		| 1			| 0				| 0
 	}
-
+	
 	private def mockCollectionCalled(name) {
 		def collection = Mock(TestCollection)
 		mongo.getCollection(name) >> collection

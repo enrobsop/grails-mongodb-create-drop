@@ -1,4 +1,4 @@
-Grails MongoDB Create-Drop Plugin
+Grails MongoDB Create-Drop Plugin [![Build Status](https://travis-ci.org/enrobsop/grails-mongodb-create-drop.png?branch=master)](https://travis-ci.org/enrobsop/grails-mongodb-create-drop)
 =================================
 
 This plugin enables Grails applications using MongoDB to mimic the "create-drop" behaviour available for other databases. This is useful during development, testing and integration.

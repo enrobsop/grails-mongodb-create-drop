@@ -15,13 +15,14 @@ class MongoCreateDropUtils {
 	
 	MongoCreateDropUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
 		def dbConfig		= grailsApplication.config.grails.mongo
-		type				= getTypeFrom(dbConfig)
+		def host			= dbConfig.host
+		type				= getTypeFrom(dbConfig)				
 		databaseName		= dbConfig.databaseName
 		username			= dbConfig.username 
 		password			= dbConfig.password 
 		collectionsRegex	= getRegexFrom(dbConfig)
 		validateConfig()
-		db = dbFactory.getByName(databaseName)
+		db = dbFactory.getByName(host, databaseName)
 	}
 	
 	void createDrop() {

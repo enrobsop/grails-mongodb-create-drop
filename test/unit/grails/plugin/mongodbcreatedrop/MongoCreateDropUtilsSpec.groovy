@@ -15,7 +15,7 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 	def setup() {
 		dbFactory 	= Mock(MongoDbFactory)
 		mongo		= Mock(TestDB)
-		dbFactory.getByName(_) >> mongo
+		dbFactory.getByName(_, _) >> mongo
 	}
 	
 	@Unroll

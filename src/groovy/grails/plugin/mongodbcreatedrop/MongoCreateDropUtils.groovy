@@ -47,14 +47,15 @@ class MongoCreateDropUtils {
 	
 	private def getTypeFrom(config) {
 		try {
-			return CreateDropType.lookup(config?.createDrop ?: "none")
+			def configType = config?.createDrop ?: "none"
+			return CreateDropType.lookup(configType)
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("Invalid value for createDrop: $config.createDrop")
 		}
 	}
 	
 	private def getRegexFrom(config) {
-		cleanRegexConfig(CreateDropType.getValue(config.createDrop)) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
+		cleanRegexConfig(CreateDropType.getValue(config?.createDrop?.toString())) ?: DEFAULT_KEEP_COLLECTIONS_PATTERN
 	}
 	
 	private def cleanRegexConfig(regex) {

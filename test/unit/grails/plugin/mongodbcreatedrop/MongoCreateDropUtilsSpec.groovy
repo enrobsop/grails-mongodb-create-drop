@@ -38,17 +38,30 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 			"keep:system\\.users"	| keep
 	}
 	
-	@Unroll
 	def "invalid createDropTypes should be handled correctly"() {
 		
 		given: "a grailsApplication config with an invalid createDropType"
 			def config = newMongoConfig([createDrop: "nonsense", databaseName: "myDb"])
 			
-			when: "creating the bootstrap helper"
-				new MongoCreateDropUtils(config, dbFactory)
+		when: "creating the bootstrap helper"
+			new MongoCreateDropUtils(config, dbFactory)
+		
+		then: "the correct type is used"
+			thrown IllegalArgumentException
+	}
+	
+	@Unroll
+	def "an unspecified createDropType [#unspecifiedType] should be handled correctly"() {
+		
+		given: "an unspecified createDrop type in the config"
+			def config = newMongoConfig([createDrop: unspecifiedType, databaseName: "myDb"])
 			
-			then: "the correct type is used"
-				thrown IllegalArgumentException
+		expect:
+			new MongoCreateDropUtils(config, dbFactory).type == none
+			
+		where:
+			unspecifiedType << [[:], null, [], ""]
+		
 	}
 	
 	def "the createDrop type defaults correctly"() {

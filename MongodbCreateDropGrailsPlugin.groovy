@@ -1,5 +1,5 @@
 class MongodbCreateDropGrailsPlugin {
-    def version = "0.1.SNAPSHOT"
+    def version = "1.0"
     def grailsVersion = "2.0 > *"
 	def dependsOn = [
 		'mongodb': "* > 1.0.0.RC3"
@@ -21,7 +21,7 @@ Provides Grails applications using MongoDB with the ability to mimic the "create
 
     def documentation = "https://github.com/enrobsop/grails-mongodb-create-drop/wiki"
 	def license = "APACHE"
-	def organization = [ name: "Morley Computing", url: "http://www.morley-computing.co.uk/" ]
+	def organization = [ name: "Paul Osborne", url: "http://www.paulosborne.me.uk/" ]
 	def issueManagement = [ system: "GitHub", url: "https://github.com/enrobsop/grails-mongodb-create-drop/issues" ]
 	def scm = [ url: "https://github.com/enrobsop/grails-mongodb-create-drop/" ]
 

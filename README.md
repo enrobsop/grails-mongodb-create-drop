@@ -16,8 +16,8 @@ Installation
 Usage
 -----
 
-1. Add `grails.mong.createDrop` config in `config/Datasource.groovy`.
-2. Invoke from `config/BootStrap.groovy`. 
+1. Add `grails.mongo.createDrop` config in `config/Datasource.groovy` (see example below).
+2. Invoke from `config/BootStrap.groovy` (see example below). 
 
 Please see the samples below.
 

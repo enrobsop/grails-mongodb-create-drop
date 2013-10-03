@@ -11,17 +11,16 @@ class MongoCreateDropUtilsSpecHelper {
 			]
 		]
 	}
-	
+
 	def getNoAuthModeConfig(options=[:]) {
 		def config = [databaseName: "aDatabase"] << options
 		newMongoConfig(config)
 	}
-	
+
 	def getAuthModeConfig(options=[:]) {
 		def config = [databaseName: "aDatabase", username: "aUser", password: "aPassword"] << options
 		newMongoConfig(config)
 	}
-
 }
 
 class TestDB {

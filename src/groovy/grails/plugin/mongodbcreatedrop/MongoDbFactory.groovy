@@ -7,5 +7,4 @@ class MongoDbFactory {
 	def getByName(dbHost="localhost",dbName) {
 		new GMongo(dbHost).getDB(dbName)
 	}
-	
 }

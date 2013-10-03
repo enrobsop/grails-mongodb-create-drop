@@ -5,5 +5,4 @@ class MongoCreateDropMixin {
 	void createDropMongo(grailsApplication) {
 		new MongoCreateDropUtils(grailsApplication).createDrop()
 	}
-		
 }

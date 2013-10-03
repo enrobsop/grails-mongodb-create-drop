@@ -86,8 +86,8 @@ Please see the samples below.
 		def init = { servletContext ->
 			createDropMongo(grailsApplication)
 			...
-      }
-      ...	
+		}
+		...	
     }
 
 Settings

@@ -1,9 +1,6 @@
 class MongodbCreateDropGrailsPlugin {
 	def version = "1.0"
 	def grailsVersion = "2.0 > *"
-	def dependsOn = [
-		'mongodb': "* > 1.0.0.RC3"
-	]
 	def pluginExcludes = [
 		"grails-app/controllers/**",
 		"grails-app/domain/**",

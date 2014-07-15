@@ -1,5 +1,8 @@
+import grails.util.Holders
+import grails.plugin.mongodbcreatedrop.MongoCreateDropUtils
+
 class MongodbCreateDropGrailsPlugin {
-	def version = "1.0"
+	def version = "1.0.1"
 	def grailsVersion = "2.0 > *"
 	def pluginExcludes = [
 		"grails-app/controllers/**",
@@ -19,4 +22,8 @@ class MongodbCreateDropGrailsPlugin {
 	def organization = [ name: "Paul Osborne", url: "http://www.paulosborne.me.uk/" ]
 	def issueManagement = [ system: "GitHub", url: "https://github.com/enrobsop/grails-mongodb-create-drop/issues" ]
 	def scm = [ url: "https://github.com/enrobsop/grails-mongodb-create-drop/" ]
+
+	def doWithApplicationContext = { ctx ->
+        new MongoCreateDropUtils(Holders.getGrailsApplication()).createDrop()
+    }
 }

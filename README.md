@@ -17,7 +17,7 @@ Usage
 -----
 
 1. Add `grails.mongo.createDrop` config in `config/Datasource.groovy` (see example below).
-2. Invoke from `config/BootStrap.groovy` (see example below).
+2. That's it!
 
 Please see the samples below.
 
@@ -71,24 +71,6 @@ Please see the samples below.
 			}
 		}
 	}
-
-### Sample `config/Bootstrap.groovy`
-
-    import grails.plugin.mongodbcreatedrop.MongoCreateDropMixin
-    import grails.test.mixin.TestMixin
-    ...
-    @Mixin(MongoCreateDropMixin)
-    @TestMixin(MongoCreateDropMixin)
-    class BootStrap {
-
-		def grailsApplication
-
-		def init = { servletContext ->
-			createDropMongo(grailsApplication)
-			...
-		}
-		...
-    }
 
 Settings
 --------

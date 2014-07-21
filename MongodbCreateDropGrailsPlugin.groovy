@@ -2,7 +2,7 @@ import grails.util.Holders
 import grails.plugin.mongodbcreatedrop.MongoCreateDropUtils
 
 class MongodbCreateDropGrailsPlugin {
-	def version = "1.0.1"
+	def version = "1.0.2"
 	def grailsVersion = "2.0 > *"
 	def pluginExcludes = [
 		"grails-app/controllers/**",

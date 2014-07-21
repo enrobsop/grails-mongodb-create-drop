@@ -1,5 +1,7 @@
 package grails.plugin.mongodbcreatedrop
 
+import grails.util.Holders
+
 import static grails.plugin.mongodbcreatedrop.CreateDropType.*
 
 class MongoCreateDropUtils {
@@ -9,25 +11,23 @@ class MongoCreateDropUtils {
 	CreateDropType type		= none
 	def collectionsRegex	= DEFAULT_KEEP_COLLECTIONS_PATTERN
 	def	databaseName
-	def	username
-	transient password
 	transient db
 
 	MongoCreateDropUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
 		def dbConfig		= grailsApplication.config.grails.mongo
-		def host			= dbConfig.host
+
 		type				= getTypeFrom(dbConfig)
-		databaseName		= dbConfig.databaseName
-		username			= dbConfig.username
-		password			= dbConfig.password
 		collectionsRegex	= getRegexFrom(dbConfig)
-		validateConfig()
-		db = dbFactory.getByName(host, databaseName)
+        databaseName		= dbConfig.databaseName
+
+        validateConfig()
+
+        def mongo = grailsApplication.getMainContext().getBean("mongo")
+        db = mongo.getDB(databaseName)
 	}
 
 	void createDrop() {
 		if (doAbortBecauseNothingToDo()) return
-		authenticate()
 		if (type == database) {
 			dropDatabase()
 		} else if (type == drop) {
@@ -65,15 +65,6 @@ class MongoCreateDropUtils {
 		regex
 	}
 
-	private boolean authenticate() {
-		boolean isAuthMode = credentialsProvided
-		if (isAuthMode) {
-			log.debug "Authenticating..."
-			db.authenticate(username, password as char[])
-		}
-		isAuthMode
-	}
-
 	private collectionsWithNameNotMatching() {
 		findCollectionNamesWhere() {!it.matches(collectionsRegex) }
 	}
@@ -98,10 +89,6 @@ class MongoCreateDropUtils {
 			log.debug "Dropping collection: $it"
 			db.getCollection(it).drop()
 		}
-	}
-
-	private boolean isCredentialsProvided() {
-		username || password
 	}
 
 	private void validateConfig() {

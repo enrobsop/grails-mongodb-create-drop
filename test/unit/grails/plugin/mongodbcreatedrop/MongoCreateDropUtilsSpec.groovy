@@ -1,31 +1,29 @@
 package grails.plugin.mongodbcreatedrop
 
-import static grails.plugin.mongodbcreatedrop.CreateDropType.*
 import grails.plugin.spock.UnitSpec
 import grails.test.mixin.TestMixin
 import spock.lang.Shared
 import spock.lang.Unroll
 
+import static grails.plugin.mongodbcreatedrop.CreateDropType.*
+
 @TestMixin(MongoCreateDropUtilsSpecHelper)
 class MongoCreateDropUtilsSpec extends UnitSpec {
 
-	@Shared dbFactory
 	@Shared mongo
 
 	def setup() {
-		dbFactory 	= Mock(MongoDbFactory)
-		mongo		= Mock(TestDB)
-		dbFactory.getByName(_, _) >> mongo
+		mongo = Mock(TestDB)
 	}
 
 	@Unroll
 	def "the correct createDrop type is used when configured as [#createDropType]"() {
 
 		given: "a grailsApplication config with createDrop type defined"
-			def config = newMongoConfig([createDrop: createDropType, databaseName: "myDb"])
+			def config = newMongoConfig([createDrop: createDropType, databaseName: "myDb"], mongo)
 
 		when: "creating the bootstrap helper"
-			def utils = new MongoCreateDropUtils(config, dbFactory)
+			def utils = new MongoCreateDropUtils(config)
 
 		then: "the correct type is used"
 			utils.type == theExpectedType
@@ -44,7 +42,7 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 			def config = newMongoConfig([createDrop: "nonsense", databaseName: "myDb"])
 
 		when: "creating the bootstrap helper"
-			new MongoCreateDropUtils(config, dbFactory)
+			new MongoCreateDropUtils(config)
 
 		then: "the correct type is used"
 			thrown IllegalArgumentException
@@ -54,10 +52,10 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 	def "an unspecified createDropType [#unspecifiedType] should be handled correctly"() {
 
 		given: "an unspecified createDrop type in the config"
-			def config = newMongoConfig([createDrop: unspecifiedType, databaseName: "myDb"])
+			def config = newMongoConfig([createDrop: unspecifiedType, databaseName: "myDb"], mongo)
 
 		expect:
-			new MongoCreateDropUtils(config, dbFactory).type == none
+			new MongoCreateDropUtils(config).type == none
 
 		where:
 			unspecifiedType << [[:], null, [], ""]
@@ -66,10 +64,10 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 	def "the createDrop type defaults correctly"() {
 
 		given: "a minimal grailsApplication config"
-			def config = newMongoConfig([databaseName: "myDb"])
+			def config = newMongoConfig([databaseName: "myDb"], mongo)
 
 		when: "creating the bootstrap helper"
-			def utils = new MongoCreateDropUtils(config, dbFactory)
+			def utils = new MongoCreateDropUtils(config)
 
 		then: "the correct type is used"
 			utils.type == none
@@ -80,10 +78,10 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 	def "the createDrop type defaults correctly when empty config"() {
 
 		given: "a minimal grailsApplication config"
-			def config = newMongoConfig([createDropType: [:], databaseName: "myDb"])
+			def config = newMongoConfig([createDropType: [:], databaseName: "myDb"], mongo)
 
 		when: "creating the bootstrap helper"
-			def utils = new MongoCreateDropUtils(config, dbFactory)
+			def utils = new MongoCreateDropUtils(config)
 
 		then: "the correct type is used"
 			utils.type == none
@@ -95,11 +93,11 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 	def "the correct 'keep pattern' should be used when configured with [#theConfiguredPattern]"() {
 
 		given: "a grailsApplication config with a 'keep pattern'"
-			def config = newMongoConfig([createDrop: "keep:${theConfiguredPattern}", databaseName: "myDb"])
+			def config = newMongoConfig([createDrop: "keep:${theConfiguredPattern}", databaseName: "myDb"], mongo)
 		and: "the anticipated default pattern"
 
 		when: "creating the bootstrap helper"
-			def utils = new MongoCreateDropUtils(config, dbFactory)
+			def utils = new MongoCreateDropUtils(config)
 
 		then: "the correct pattern is used"
 			utils.collectionsRegex == theExpectedPattern
@@ -118,7 +116,7 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 			def config = newMongoConfig([:])
 
 		when: "creating the bootstrap helper"
-			new MongoCreateDropUtils(config, dbFactory)
+			new MongoCreateDropUtils(config)
 
 		then: "a configuration exception is thrown"
 			thrown IllegalArgumentException
@@ -136,7 +134,8 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 			def collectionNames			= ["category","book","author","system.indexes","system.users"]
 
 		when: "invoking createDrop"
-			new MongoCreateDropUtils(theConfig, dbFactory).createDrop()
+			setDB(theConfig, mongo)
+			new MongoCreateDropUtils(theConfig).createDrop()
 
 		then: "dropDatabase is called correctly"
 			nDropDb * mongo.dropDatabase()
@@ -152,18 +151,13 @@ class MongoCreateDropUtilsSpec extends UnitSpec {
 			nSyserUser 	* sysUsersCollection.drop()
 
 		where:
-			theConfig 														| nDropDb	| nAuthenticate	| nCollections	| nCategory	| nBook	| nAuthor	| nSysIndexes	| nSyserUser
-			getNoAuthModeConfig([createDrop:"database"])					| 1			| 0 			| 0				| 0			| 0		| 0			| 0				| 0
-			getNoAuthModeConfig([createDrop:"none"])						| 0			| 0				| 0				| 0			| 0		| 0			| 0				| 0
-			getNoAuthModeConfig([createDrop:"collections"])					| 0			| 0				| 1 			| 1			| 1		| 1			| 0				| 0
-			getNoAuthModeConfig([createDrop:"keep:system\\.users"])			| 0			| 0				| 1				| 1			| 1		| 1			| 1				| 0
-			getNoAuthModeConfig([createDrop:"keep:(system\\.users|book)"])	| 0			| 0				| 1				| 1			| 0		| 1			| 1				| 0
-			getNoAuthModeConfig([createDrop:"drop:(book|author)"])			| 0			| 0				| 1				| 0			| 1		| 1			| 0				| 0
-			getAuthModeConfig([createDrop:"database"])						| 1			| 1				| 0				| 0			| 0		| 0			| 0				| 0
-			getAuthModeConfig([createDrop:"none"])							| 0			| 0				| 0				| 0			| 0		| 0			| 0				| 0
-			getAuthModeConfig([createDrop:"collections"])					| 0			| 1				| 1				| 1			| 1		| 1			| 0				| 0
-			getAuthModeConfig([createDrop:"keep:system\\.users"])			| 0			| 1				| 1				| 1			| 1		| 1			| 1				| 0
-			getAuthModeConfig([createDrop:"drop:(book|author)"])			| 0			| 1				| 1				| 0			| 1		| 1			| 0				| 0
+			theConfig 												| nDropDb	| nAuthenticate	| nCollections	| nCategory	| nBook	| nAuthor	| nSysIndexes	| nSyserUser
+			curryConfig([createDrop:"database"])					| 1			| 0 			| 0				| 0			| 0		| 0			| 0				| 0
+			curryConfig([createDrop:"none"])						| 0			| 0				| 0				| 0			| 0		| 0			| 0				| 0
+			curryConfig([createDrop:"collections"])					| 0			| 0				| 1 			| 1			| 1		| 1			| 0				| 0
+			curryConfig([createDrop:"keep:system\\.users"])			| 0			| 0				| 1				| 1			| 1		| 1			| 1				| 0
+			curryConfig([createDrop:"keep:(system\\.users|book)"])	| 0			| 0				| 1				| 1			| 0		| 1			| 1				| 0
+			curryConfig([createDrop:"drop:(book|author)"])			| 0			| 0				| 1				| 0			| 1		| 1			| 0				| 0
 	}
 
 	private mockCollectionCalled(name) {

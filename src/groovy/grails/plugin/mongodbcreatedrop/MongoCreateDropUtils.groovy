@@ -1,7 +1,5 @@
 package grails.plugin.mongodbcreatedrop
 
-import grails.util.Holders
-
 import static grails.plugin.mongodbcreatedrop.CreateDropType.*
 
 class MongoCreateDropUtils {
@@ -13,7 +11,8 @@ class MongoCreateDropUtils {
 	def	databaseName
 	transient db
 
-	MongoCreateDropUtils(grailsApplication, dbFactory = new MongoDbFactory()) {
+	MongoCreateDropUtils(grailsApplication, dbFactory = null) {
+		// TODO Remove dbFactory arg, it isn't used any longer.
 		def dbConfig		= grailsApplication.config.grails.mongo
 
 		type				= getTypeFrom(dbConfig)

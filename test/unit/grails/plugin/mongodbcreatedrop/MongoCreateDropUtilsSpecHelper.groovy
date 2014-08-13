@@ -2,25 +2,41 @@ package grails.plugin.mongodbcreatedrop
 
 class MongoCreateDropUtilsSpecHelper {
 
-	def newMongoConfig(options=[:]) {
-		[
+	def newMongoConfig(options=[:], db=null) {
+		def mongoConfig = [
 			config: [
 				grails: [
 					mongo: options
 				]
 			]
 		]
+
+		if (db) {
+			setDB(mongoConfig, db)
+		}
+
+		mongoConfig
 	}
 
-	def getNoAuthModeConfig(options=[:]) {
+	def curryConfig(options=[:]) {
 		def config = [databaseName: "aDatabase"] << options
 		newMongoConfig(config)
 	}
 
-	def getAuthModeConfig(options=[:]) {
-		def config = [databaseName: "aDatabase", username: "aUser", password: "aPassword"] << options
-		newMongoConfig(config)
+	def setDB(theConfig, mongo) {
+
+		def mongoDb = [
+			getDB: { databaseName -> mongo }
+		]
+
+		theConfig.getMainContext = {[
+			getBean: { beanName ->
+				(beanName == "mongo") ? mongoDb : null
+			}
+		]}
+
 	}
+
 }
 
 class TestDB {

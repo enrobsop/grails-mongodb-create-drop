@@ -11,8 +11,15 @@ class MongoCreateDropUtils {
 	def	databaseName
 	transient db
 
-	MongoCreateDropUtils(grailsApplication, dbFactory = null) {
-		// TODO Remove dbFactory arg, it isn't used any longer.
+	/**
+	 * @deprecated dbFactory is no longer used, use {@link #MongoCreateDropUtils(grailsApplication)}.
+	 * // TODO Remove this constructor.
+	 */
+	MongoCreateDropUtils(grailsApplication, dbFactory) {
+		this(grailsApplication)
+	}
+
+	MongoCreateDropUtils(grailsApplication) {
 		def dbConfig		= grailsApplication.config.grails.mongo
 
 		type				= getTypeFrom(dbConfig)
